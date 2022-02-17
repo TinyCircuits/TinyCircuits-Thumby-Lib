@@ -1,5 +1,7 @@
 # TinyCircuits C/C++ Thmuby Library
 
+**This is in a beta state! Do not use for large projects, changes are expected!**
+
 This Arduino library is intended for use with TinyCircuits' Thumby
 
 *Support this library by buying products from **[TinyCircuits](https://tinycircuits.com/)***
