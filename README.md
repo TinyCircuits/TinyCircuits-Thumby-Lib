@@ -1,4 +1,4 @@
-# TinyCircuits C/C++ Thmuby Library
+# TinyCircuits C/C++ Thumby Library
 
 **This is in a beta state! Do not use for large projects, changes are expected!**
 
