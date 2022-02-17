@@ -1,6 +1,11 @@
 #ifndef Thumby_h
 #define Thumby_h
 
+
+#include "ssd1306.h"
+#include "GraphicsBuffer.h"
+
+
 #define THUMBY_LINK_TX_PIN 0
 #define THUMBY_LINK_RX_PIN 1
 #define THUMBY_LINK_PU_PIN 2
@@ -28,18 +33,16 @@
 #define BUTTON_A 0b00100000
 
 
-class Thumby{
+class Thumby : public ssd1306, public GraphicsBuffer{
   public:
+    Thumby() : ssd1306(), GraphicsBuffer(THUMBY_SCREEN_WIDTH, THUMBY_SCREEN_HEIGHT, colorDepth1BPP){}
     void begin();
+    void update();
     bool checkPressed(uint8_t mask);
     bool linkPack(uint8_t* dataBuf, uint8_t* packedBuf);
     bool linkUnpack(uint8_t* packedBuf, uint8_t* dataBuf);
     void play(uint32_t freq, uint16_t duty = 32768);
     void stopPlay();
-    void setBrightness(uint8_t brightness);
-    void sendCommand(uint8_t command);
-    void update(uint8_t* buffer, int bufferLength);
-  private:
 };
 
 

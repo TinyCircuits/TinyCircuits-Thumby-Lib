@@ -3,22 +3,17 @@
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
 #include "SPI.h"
-#include "TinierScreen.h"
-
-
-int _csPin = 16;
-int _sckPin = 18;
-int _sdaPin = 19;
-int _dcPin = 17;
 
 
 // Setup pins for link, buttons, and audio
 void Thumby::begin(){
+  // Setup link link pins
   pinMode(THUMBY_LINK_TX_PIN, OUTPUT);
   pinMode(THUMBY_LINK_RX_PIN, INPUT);
   pinMode(THUMBY_LINK_PU_PIN, OUTPUT);
   digitalWrite(THUMBY_LINK_PU_PIN, HIGH);
   
+  // Setup button pins
   pinMode(THUMBY_BTN_LDPAD_PIN, INPUT_PULLUP);
   pinMode(THUMBY_BTN_RDPAD_PIN, INPUT_PULLUP);
   pinMode(THUMBY_BTN_UDPAD_PIN, INPUT_PULLUP);
@@ -29,53 +24,16 @@ void Thumby::begin(){
   // Set audio pin as pwm
   gpio_set_function(THUMBY_AUDIO_PIN, GPIO_FUNC_PWM);
 
+  // Setup screen and screen buffer
+  ssd1306::begin();
+  GraphicsBuffer::begin();
+  GraphicsBuffer::setFont(thinPixel7_10ptFontInfo);
+}
 
 
-  pinMode(THUMBY_SCREEN_RESET_PIN, OUTPUT);
-  digitalWrite(THUMBY_SCREEN_RESET_PIN, LOW);
-  delay(10);
-  digitalWrite(THUMBY_SCREEN_RESET_PIN, HIGH);
-
-  pinMode(_csPin, OUTPUT);
-  pinMode(_dcPin, OUTPUT);
-  SPI.begin();
-
-
-  sendCommand(SSD1306_DISPLAYOFF);
-  sendCommand(SSD1306_SETDISPLAYCLOCKDIV);
-  sendCommand(0x80);
-  sendCommand(SSD1306_SETDISPLAYOFFSET);
-  sendCommand(0x00);
-  sendCommand(SSD1306_SETSTARTLINE | 0x00);
-  sendCommand(SSD1306_DISPLAYALLON_RESUME);
-  sendCommand(SSD1306_NORMALDISPLAY);
-  sendCommand(SSD1306_CHARGEPUMP);
-  sendCommand(0x14);       //Internal
-  sendCommand(SSD1306_MEMORYMODE);
-  sendCommand(0x00);
-  sendCommand(SSD1306_SEGREMAP|1);
-  sendCommand(SSD1306_COMSCANDEC);
-  sendCommand(SSD1306_SETCONTRAST);
-  sendCommand(30);//0xAF
-
-  sendCommand(SSD1306_SETPRECHARGE);
-  sendCommand(0xF1);
-
-  sendCommand(SSD1306_SETVCOMDETECT);///////try 0x30 for all?
-  sendCommand(0x20);
-
-  sendCommand(SSD1306_SETMULTIPLEX);
-  sendCommand(40 - 1);
-
-  sendCommand(SSD1306_SETCOMPINS);
-  sendCommand(0x12);
-
-  
-  sendCommand(0xAD);
-  sendCommand(0x30);
-  
-
-  sendCommand(SSD1306_DISPLAYON);
+// Send buffer to screen through ssd1306 library
+void Thumby::update(){
+  ssd1306::writeBuffer(getBuffer(), getBufferSize());
 }
 
 
@@ -179,43 +137,4 @@ void Thumby::stopPlay(){
   
   // Set the PWM not running
   pwm_set_enabled(slice_num, false);
-}
-
-
-// Set the screen brightness to a value between 0 (off) and 127 (max)
-void Thumby::setBrightness(uint8_t brightness){
-  if(brightness>127){
-    brightness = 127;
-  }
-  
-  sendCommand(0x81);
-  sendCommand(brightness);
-}
-
-
-void Thumby::update(uint8_t* buffer, int bufferLength){
-  // TinierScreen::writeBuffer(buffer, bufferLength);
-
-  sendCommand(SSD1306_COLUMNADDR);
-  sendCommand(28);
-  sendCommand(99);
-
-  sendCommand(SSD1306_PAGEADDR);
-  sendCommand(0x00);
-  sendCommand(0x05);
-
-  digitalWrite(_csPin, 1);
-  digitalWrite(_dcPin, 1);
-  digitalWrite(_csPin, 0);
-  SPI.transfer(buffer, NULL, bufferLength);
-  digitalWrite(_csPin, 1);
-}
-
-
-void Thumby::sendCommand(uint8_t command){
-  digitalWrite(_csPin, 1);
-  digitalWrite(_dcPin, 0);
-  digitalWrite(_csPin, 0);
-  SPI.transfer(command);
-  digitalWrite(_csPin, 1);
 }
