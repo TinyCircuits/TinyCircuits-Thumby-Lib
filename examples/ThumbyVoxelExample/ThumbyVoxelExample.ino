@@ -70,6 +70,9 @@ void control(){
 }
 
 
+float lastUpdateTime = 0;
+
+
 void render(){
   thumby.clear();
   
@@ -114,6 +117,10 @@ void render(){
     deltaz += 0.05f;
     z += deltaz;
   }
+
+  thumby.setCursor(0, 0);
+  thumby.print(1000.0f/(millis()-lastUpdateTime));
+  lastUpdateTime = millis();
 
   thumby.update();
 }

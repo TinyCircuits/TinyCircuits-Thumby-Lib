@@ -1,5 +1,3 @@
-#include "D1Dither.h"
-#include "D1Height.h"
 #include <Thumby.h>
 
 
