@@ -77,6 +77,13 @@ void control(){
 float lastUpdateTime = 0;
 
 
+void displayFPS(){
+  thumby.setCursor(0, 0);
+  thumby.print(1000.0f/(millis()-lastUpdateTime));
+  lastUpdateTime = millis();
+}
+
+
 void render(){
   thumby.clear();
   
@@ -102,7 +109,7 @@ void render(){
     float invz = 1.0f / z * 240.0f;
 
     for(uint8_t i=0; i<THUMBY_SCREEN_WIDTH; i++){
-//      if(plx >= 0 && plx < mapWidth && ply >= 0 && ply < mapHeight){
+      if(plx >= 0 && plx < mapWidth && ply >= 0 && ply < mapHeight){
         int byteIndex = int((int(ply) * mapWidth) + int(plx));
         if(byteIndex >= 0 && byteIndex < mapTotal){
           if(D1Dither[byteIndex] > 0){
@@ -112,7 +119,7 @@ void render(){
             }
           }
         }
-//      }
+      }
 
       plx += dx;
       ply += dy;
@@ -122,9 +129,7 @@ void render(){
     z += deltaz;
   }
 
-  thumby.setCursor(0, 0);
-  thumby.print(1000.0f/(millis()-lastUpdateTime));
-  lastUpdateTime = millis();
+  displayFPS();
 
   thumby.update();
 }
