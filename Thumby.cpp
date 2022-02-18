@@ -60,15 +60,13 @@ bool Thumby::checkPressed(uint8_t mask){
 // Pack dataBuf into packedBuf (adds 2 size bytes, 
 // 1 checksum, and returns false if size too large to
 // fit in packet, or too large to fit in packedBuf)
-bool Thumby::linkPack(uint8_t* dataBuf, uint8_t* packedBuf){
-  uint16_t dataBufLen = sizeof(dataBuf)/(sizeof(uint8_t));
-  uint16_t packedBufLen = sizeof(packedBuf)/(sizeof(uint8_t));
+int8_t Thumby::linkPack(uint8_t* dataBuf, uint16_t dataBufLen, uint8_t* packedBuf, uint16_t packedBufLen){
   uint16_t packetLength = dataBufLen+3;
 
   // Check that the data length can be indexed by two bytes and
   // that it will fit into the packed buffer with header bytes
   if(dataBufLen > 512 || packetLength > packedBufLen){
-    return false;
+    return -1;
   }
 
   // Prepare packet header
@@ -77,28 +75,26 @@ bool Thumby::linkPack(uint8_t* dataBuf, uint8_t* packedBuf){
   packedBuf[2] = 0;
 
   // Generate checksum and copy data
-  for(uint16_t b=0; b<dataBufLen+3; b++){
+  for(uint16_t b=0; b<dataBufLen; b++){
     packedBuf[2] ^= dataBuf[b];
     packedBuf[b+3] = dataBuf[b];
   }
 
-  return true;
+  return packetLength;
 }
 
 
 // Unpack packedBuf to dataBuf (removes 1 checksum byte, and 2 size 
 // bytes but returns false if checksum or size check fails, or if
 // stripped packedBuf data cannot fit in dataBuf)
-bool Thumby::linkUnpack(uint8_t* packedBuf, uint8_t* dataBuf){
-  uint16_t dataBufLen = sizeof(dataBuf)/(sizeof(uint8_t));
-  uint16_t packedBufLen = sizeof(packedBuf)/(sizeof(uint8_t));
+int8_t Thumby::linkUnpack(uint8_t* packedBuf, uint16_t packedBufLen, uint8_t* dataBuf, uint16_t dataBufLen){
   uint16_t dataLength = (packedBuf[0] << 8) + packedBuf[1];
 
   // Check that packet data will fit in data buffer and that
   // the received data length is the same as the actual received
   // packet length minus the 3 header bytes
   if(packedBufLen-3 > dataBufLen || dataLength != packedBufLen-3){
-    return false;
+    return -1;
   }
 
   // Copy data and generate checksum off received data
@@ -108,12 +104,12 @@ bool Thumby::linkUnpack(uint8_t* packedBuf, uint8_t* dataBuf){
     checksum ^= dataBuf[b];
   }
 
-  // Return false if received and generaed checksums are not the same
+  // Return false if received and generated checksums are not the same
   if(checksum != packedBuf[2]){
-    return false;
+    return -1;
   }
 
-  return true;
+  return dataLength;
 }
 
 

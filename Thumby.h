@@ -39,8 +39,8 @@ class Thumby : public ssd1306, public GraphicsBuffer{
     void begin();
     void update();
     bool checkPressed(uint8_t mask);
-    bool linkPack(uint8_t* dataBuf, uint8_t* packedBuf);
-    bool linkUnpack(uint8_t* packedBuf, uint8_t* dataBuf);
+    int8_t linkPack(uint8_t* dataBuf, uint16_t dataBufLen, uint8_t* packedBuf, uint16_t packedBufLen);
+    int8_t linkUnpack(uint8_t* packedBuf, uint16_t packedBufLen, uint8_t* dataBuf, uint16_t dataBufLen);
     void play(uint32_t freq, uint16_t duty = 32768);
     void stopPlay();
 };
