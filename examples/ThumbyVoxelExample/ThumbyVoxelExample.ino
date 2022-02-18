@@ -1,3 +1,7 @@
+// A more complex example of using the Thumby Arduino C/C++ library to draw a simple voxel terrain
+// This example depends on TinyCircuits' Thumby.h+ssd1306.h and GraphicsBuffer.h+font.h as well
+// as the Arduino RP2040 board package by earlephilhower
+
 #include "D1Dither.h"
 #include "D1Height.h"
 #include <Thumby.h>
