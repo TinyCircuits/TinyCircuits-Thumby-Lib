@@ -1,0 +1,16 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin KEYWORD2
+writeBuffer KEYWORD2
+sendCommand KEYWORD2
+setBrightness KEYWORD2
+isPressed KEYWORD2
+linkPack KEYWORD2
+linkUnpack KEYWORD2
+play KEYWORD2
+stopPlay KEYWORD2

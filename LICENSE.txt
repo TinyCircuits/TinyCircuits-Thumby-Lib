@@ -1,0 +1,5 @@
+All files are released under the Creative Commons Attribution Share-Alike 3.0 License, see the following link for details: http://creativecommons.org/licenses/by-sa/3.0
+
+All text above must be included in any redistribution or derived design
+
+Please support the open-source hardware community
