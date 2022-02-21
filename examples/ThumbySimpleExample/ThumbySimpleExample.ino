@@ -47,7 +47,7 @@ void send(){
 }
 
 
-// Get a messge from over link
+// Get a message from over link
 void receive(){
   // If enough bytes in RX to fit packed message, read and try to unpack
   if(Serial1.available() >= 10){
