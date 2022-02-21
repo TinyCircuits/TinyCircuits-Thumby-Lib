@@ -24,21 +24,101 @@ void Thumby::begin(){
   // Set audio pin as pwm
   gpio_set_function(THUMBY_AUDIO_PIN, GPIO_FUNC_PWM);
 
-  // Setup screen and screen buffer
-  ssd1306::begin();
+  // Init half-duplex UART for link cable
+  Serial1.begin(115200);
+
+  // Setup screen
+  pinMode(THUMBY_CS_PIN, OUTPUT);
+  pinMode(THUMBY_DC_PIN, OUTPUT);
+  SPI.begin();
+
+  // Reset the screen
+  pinMode(THUMBY_RESET_PIN, OUTPUT);
+  digitalWrite(THUMBY_RESET_PIN, LOW);
+  delay(10);
+  digitalWrite(THUMBY_RESET_PIN, HIGH);
+
+  // Init the screen
+  sendCommand(SSD1306_DISPLAYOFF);
+  sendCommand(SSD1306_SETDISPLAYCLOCKDIV);
+  sendCommand(0x80);
+  sendCommand(SSD1306_SETDISPLAYOFFSET);
+  sendCommand(0x00);
+  sendCommand(SSD1306_SETSTARTLINE | 0x00);
+  sendCommand(SSD1306_DISPLAYALLON_RESUME);
+  sendCommand(SSD1306_NORMALDISPLAY);
+  sendCommand(SSD1306_CHARGEPUMP);
+  sendCommand(0x14);
+  sendCommand(SSD1306_MEMORYMODE);
+  sendCommand(0x00);
+  sendCommand(SSD1306_SEGREMAP|1);
+  sendCommand(SSD1306_COMSCANDEC);
+  sendCommand(SSD1306_SETCONTRAST);
+  sendCommand(30);
+
+  sendCommand(SSD1306_SETPRECHARGE);
+  sendCommand(0xF1);
+
+  sendCommand(SSD1306_SETVCOMDETECT);
+  sendCommand(0x20);
+
+  sendCommand(SSD1306_SETMULTIPLEX);
+  sendCommand(40 - 1);
+
+  sendCommand(SSD1306_SETCOMPINS);
+  sendCommand(0x12);
+
+  sendCommand(0xAD);
+  sendCommand(0x30);
+
+  sendCommand(SSD1306_DISPLAYON);
+
+  // Setup screen buffer
   GraphicsBuffer::begin();
   GraphicsBuffer::setFont(thinPixel7_10ptFontInfo);
 }
 
 
-// Send buffer to screen through ssd1306 library
-void Thumby::update(){
-  ssd1306::writeBuffer(getBuffer(), getBufferSize());
+void Thumby::sendCommand(uint8_t command){
+  digitalWrite(THUMBY_CS_PIN, 1);
+  digitalWrite(THUMBY_DC_PIN, 0);
+  digitalWrite(THUMBY_CS_PIN, 0);
+  SPI.transfer(command);
+  digitalWrite(THUMBY_CS_PIN, 1);
+}
+
+
+// Send buffer to screen
+void Thumby::writeBuffer(uint8_t* buffer, int bufferLength){
+  sendCommand(SSD1306_COLUMNADDR);
+  sendCommand(28);
+  sendCommand(99);
+
+  sendCommand(SSD1306_PAGEADDR);
+  sendCommand(0x00);
+  sendCommand(0x05);
+
+  digitalWrite(THUMBY_CS_PIN, 1);
+  digitalWrite(THUMBY_DC_PIN, 1);
+  digitalWrite(THUMBY_CS_PIN, 0);
+  SPI.transfer(buffer, NULL, bufferLength);
+  digitalWrite(THUMBY_CS_PIN, 1);
+}
+
+
+// Set the screen brightness to a value between 0 (off) and 127 (max)
+void Thumby::setBrightness(uint8_t brightness){
+  if(brightness>127){
+    brightness = 127;
+  }
+  
+  sendCommand(0x81);
+  sendCommand(brightness);
 }
 
 
 // Return true if any buttons in the mask are detected as pressed
-bool Thumby::checkPressed(uint8_t mask){
+bool Thumby::isPressed(uint8_t mask){
   if(mask & (1 << 0) && !digitalRead(THUMBY_BTN_LDPAD_PIN)){
     return true;
   }else if(mask & (1 << 1) && !digitalRead(THUMBY_BTN_RDPAD_PIN)){

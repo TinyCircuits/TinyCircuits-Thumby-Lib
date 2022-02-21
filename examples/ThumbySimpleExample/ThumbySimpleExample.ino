@@ -36,6 +36,8 @@ void playMessageSound(){
 void send(){
   // If packing does not fail, send over Serial1
   if(thumby.linkPack((uint8_t*)sendBuf, sizeof(sendBuf), packedBuf, sizeof(packedBuf)) != -1){
+
+    // Write on Serial1 (this this initialzed in the Thumby Lib)
     Serial1.write(packedBuf, sizeof(packedBuf));
 
     // Remove echoed RX bytes
@@ -74,9 +76,6 @@ void setup() {
   // Init duplex UART for Thumby to PC comms
   Serial.begin(115200);
 
-  // Init half-duplex UART for link cable
-  Serial1.begin(115200);
-
   // Make sure RX buffer is empty
   removeRxBytes();
 }
@@ -91,7 +90,7 @@ void loop() {
   thumby.print("Thumby!");
 
   // If A or B is pressed, send a message
-  if(thumby.checkPressed(BUTTON_A | BUTTON_B)){
+  if(thumby.isPressed(BUTTON_A | BUTTON_B)){
     // Send a message over link
     send();
 
@@ -103,5 +102,5 @@ void loop() {
   receive();
 
   // Update the screen
-  thumby.update();
+  thumby.writeBuffer(thumby.getBuffer(), thumby.getBufferSize());
 }

@@ -30,9 +30,6 @@ void setup() {
 
   // Init duplex UART for Thumby to PC comms
   Serial.begin(115200);
-
-  // Init half-duplex UART for link cable
-  Serial1.begin(115200);
 }
 
 
@@ -40,36 +37,36 @@ void setup() {
 void control(){
   // Move on XY plane of in viewMode 1, else rotate camera left/right or up/down
   if(viewMode){
-    if(thumby.checkPressed(BUTTON_L)){
+    if(thumby.isPressed(BUTTON_L)){
       cameraX += 1;
-    }else if(thumby.checkPressed(BUTTON_R)){
+    }else if(thumby.isPressed(BUTTON_R)){
       cameraX -= 1;
-    }else if(thumby.checkPressed(BUTTON_U)){
+    }else if(thumby.isPressed(BUTTON_U)){
       cameraY += 1;
-    }else if(thumby.checkPressed(BUTTON_D)){
+    }else if(thumby.isPressed(BUTTON_D)){
       cameraY -= 1;
-    }else if(thumby.checkPressed(BUTTON_A)){
+    }else if(thumby.isPressed(BUTTON_A)){
       cameraZ += 1;
     }
   }else{
-    if(thumby.checkPressed(BUTTON_L)){
+    if(thumby.isPressed(BUTTON_L)){
       cameraAngle += 0.05f;
-    }else if(thumby.checkPressed(BUTTON_R)){
+    }else if(thumby.isPressed(BUTTON_R)){
       cameraAngle -= 0.05f;
-    }else if(thumby.checkPressed(BUTTON_U)){
+    }else if(thumby.isPressed(BUTTON_U)){
       cameraHorizon -= 25;
-    }else if(thumby.checkPressed(BUTTON_D)){
+    }else if(thumby.isPressed(BUTTON_D)){
       cameraHorizon += 25;
-    }else if(thumby.checkPressed(BUTTON_A)){
+    }else if(thumby.isPressed(BUTTON_A)){
       cameraZ -= 1;
     }
   }
 
   // Change view mode
-  if(thumby.checkPressed(BUTTON_B)){
+  if(thumby.isPressed(BUTTON_B)){
     viewMode = !viewMode;
 
-    while(thumby.checkPressed(BUTTON_B)){}
+    while(thumby.isPressed(BUTTON_B)){}
   }
 }
 
@@ -131,7 +128,7 @@ void render(){
 
   displayFPS();
 
-  thumby.update();
+  thumby.writeBuffer(thumby.getBuffer(), thumby.getBufferSize());
 }
 
 
